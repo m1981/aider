@@ -1117,8 +1117,18 @@ def register_litellm_models(model_fnames):
             if not model_def:
                 continue
 
-            # Defer registration with litellm to faster path.
+            # Keep aider's own metadata view in sync...
             model_info_manager.local_model_metadata.update(model_def)
+            # ...and register with litellm so it can infer the provider and
+            # pricing for models it doesn't ship built-in (e.g. brand-new
+            # Claude releases). Without this, litellm raises
+            # "LLM Provider NOT provided" for unknown bare model names.
+            try:
+                litellm.register_model(model_def)
+            except Exception:
+                # Registration is best-effort; aider still has the metadata
+                # in local_model_metadata for its own cost/limit calculations.
+                pass
         except Exception as e:
             raise Exception(f"Error loading model definition from {model_fname}: {e}")
 
