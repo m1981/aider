@@ -277,6 +277,7 @@ class MarkdownStream:
 
         fence_count = 0
         offset = 0
+        prev_safe_split = 0
         last_safe_split = 0
 
         for line in lines:
@@ -288,9 +289,15 @@ class MarkdownStream:
 
             # A blank line is a paragraph boundary in markdown.
             if line.strip() == "" and fence_count % 2 == 0:
+                prev_safe_split = last_safe_split
                 last_safe_split = offset
 
-        return last_safe_split, text[last_safe_split:]
+        # Use the second-to-last safe split point so that the last complete
+        # paragraph stays in the unstable suffix. This avoids a rendering
+        # difference where Rich omits the trailing blank line after the last
+        # block when it is rendered in isolation (as the stable prefix) vs
+        # when it is rendered as part of the full document.
+        return prev_safe_split, text[prev_safe_split:]
 
 
 if __name__ == "__main__":
