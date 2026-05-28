@@ -115,12 +115,37 @@ class MarkdownStream:
         else:
             self.mdargs = dict()
 
+        # Cache for the rendered "stable" markdown prefix to avoid re-rendering
+        # the entire document on every streaming update (which is O(n^2)).
+        self._stable_prefix_len = 0
+        self._stable_rendered_lines = []
+
         # Defer Live creation until the first update.
         self.live = None
         self._live_started = False
 
+    def _render_text(self, text):
+        """Render markdown text to a string of ANSI output.
+
+        Args:
+            text (str): Markdown text to render
+
+        Returns:
+            str: Rendered ANSI output
+        """
+        string_io = io.StringIO()
+        console = Console(file=string_io, force_terminal=True)
+        markdown = NoInsetMarkdown(text, **self.mdargs)
+        console.print(markdown)
+        return string_io.getvalue()
+
     def _render_markdown_to_lines(self, text):
         """Render markdown text to a list of lines.
+
+        Renders incrementally: a "stable" prefix of the markdown (whole blocks
+        ending at a blank-line boundary outside any open code fence) is rendered
+        once and cached, and only the trailing "unstable" suffix is re-rendered
+        on each call. This avoids re-rendering the whole document every update.
 
         Args:
             text (str): Markdown text to render
@@ -128,15 +153,23 @@ class MarkdownStream:
         Returns:
             list: List of rendered lines with line endings preserved
         """
-        # Render the markdown to a string buffer
-        string_io = io.StringIO()
-        console = Console(file=string_io, force_terminal=True)
-        markdown = NoInsetMarkdown(text, **self.mdargs)
-        console.print(markdown)
-        output = string_io.getvalue()
+        prefix, suffix = self.find_minimal_suffix(text)
 
-        # Split rendered output into lines
-        return output.splitlines(keepends=True)
+        # Re-render and cache the stable prefix only when it has grown.
+        if prefix != self._stable_prefix_len:
+            stable_text = text[:prefix]
+            if stable_text:
+                self._stable_rendered_lines = self._render_text(stable_text).splitlines(
+                    keepends=True
+                )
+            else:
+                self._stable_rendered_lines = []
+            self._stable_prefix_len = prefix
+
+        suffix_output = self._render_text(suffix) if suffix else ""
+        suffix_lines = suffix_output.splitlines(keepends=True)
+
+        return self._stable_rendered_lines + suffix_lines
 
     def __del__(self):
         """Destructor to ensure Live display is properly cleaned up."""
@@ -224,8 +257,40 @@ class MarkdownStream:
 
     def find_minimal_suffix(self, text, match_lines=50):
         """
-        Splits text into chunks on blank lines "\n\n".
+        Split text into a stable prefix and an unstable trailing suffix.
+
+        The split point is the last blank-line boundary ("\n\n") that lies
+        outside of any open code fence. Everything before it is considered
+        "stable" (its rendering will not change as more text is appended) and
+        can be cached; everything after it is the "unstable" suffix that must
+        be re-rendered on each update.
+
+        Returns:
+            tuple: (prefix_len, suffix_text) where ``text[:prefix_len]`` is the
+            stable prefix and ``suffix_text`` is the remainder.
         """
+        # Determine which blank-line boundaries sit outside an open code fence.
+        # A code fence toggles on lines that start with ``` (after optional
+        # whitespace). We only allow splitting when the number of fence markers
+        # seen so far is even (i.e. not inside a fenced block).
+        lines = text.splitlines(keepends=True)
+
+        fence_count = 0
+        offset = 0
+        last_safe_split = 0
+
+        for line in lines:
+            stripped = line.lstrip()
+            if stripped.startswith("```"):
+                fence_count += 1
+
+            offset += len(line)
+
+            # A blank line is a paragraph boundary in markdown.
+            if line.strip() == "" and fence_count % 2 == 0:
+                last_safe_split = offset
+
+        return last_safe_split, text[last_safe_split:]
 
 
 if __name__ == "__main__":
