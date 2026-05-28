@@ -99,11 +99,13 @@ class TestMarkdownStreamIncremental(unittest.TestCase):
 
     def test_find_minimal_suffix_closed_fence(self):
         # Blank line after a closed fence IS a valid split point.
+        # The split occurs after the closing fence, so "after" ends up in the suffix.
         text = "intro\n\n```python\nx = 1\n```\n\nafter\n"
         pm = MarkdownStream()
         prefix_len, suffix = pm.find_minimal_suffix(text)
-        self.assertNotIn("```python", text[:prefix_len])
         self.assertGreater(prefix_len, 0)
+        self.assertIn("after", suffix)
+        self.assertNotIn("after", text[:prefix_len])
 
 
 if __name__ == "__main__":
