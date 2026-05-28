@@ -159,9 +159,25 @@ class MarkdownStream:
         if prefix != self._stable_prefix_len:
             stable_text = text[:prefix]
             if stable_text:
-                self._stable_rendered_lines = self._render_text(stable_text).splitlines(
-                    keepends=True
-                )
+                # Render the prefix both with and without a trailing sentinel
+                # paragraph.  Rich renders the last block differently when it
+                # has no successor (it omits the trailing blank line), so we
+                # append a sentinel to force non-terminal rendering, then keep
+                # only the lines that are identical in both renders — those are
+                # truly stable and will match the full-document render.
+                sentinel = "\u200b\n"  # zero-width space — renders as blank
+                lines_plain = self._render_text(stable_text).splitlines(keepends=True)
+                lines_with_sentinel = self._render_text(
+                    stable_text + "\n" + sentinel
+                ).splitlines(keepends=True)
+                # Find the longest common prefix of the two line lists.
+                stable_len = 0
+                for a, b in zip(lines_plain, lines_with_sentinel):
+                    if a == b:
+                        stable_len += 1
+                    else:
+                        break
+                self._stable_rendered_lines = lines_with_sentinel[:stable_len]
             else:
                 self._stable_rendered_lines = []
             self._stable_prefix_len = prefix
