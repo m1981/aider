@@ -1,10 +1,3 @@
-# Handoff Summary — Continue This Work in a New Chat
-
-## Status: COMPLETE ✓
-
-All tasks are done. All 5 tests pass. The code is clean.
-
-
 import unittest                                                                                                        
                                                                                                                        
 from aider.mdstream import MarkdownStream                                                                              
@@ -56,7 +49,7 @@ class TestMarkdownStreamIncremental(unittest.TestCase):
         # A blank line inside an unclosed fence must not become a stable split.                                        
         text = "intro\n\n```python\ndef foo():\n\n    return 1\n"                                                      
         pm = MarkdownStream()                                                                                          
-        prefix_len, suffix = pm.find_minimal_suffix(text)                                                             
+        prefix_len, suffix = pm.find_minimal_suffix(text)                                                              
         # The split must occur before the opening fence, leaving the fence in                                          
         # the unstable suffix.                                                                                         
         self.assertIn("```python", suffix)                                                                             

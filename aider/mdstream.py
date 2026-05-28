@@ -233,11 +233,13 @@ class MarkdownStream:
         """
         Split text into a stable prefix and an unstable trailing suffix.
 
-        The split point is the last blank-line boundary ("\n\n") that lies
-        outside of any open code fence. Everything before it is considered
-        "stable" (its rendering will not change as more text is appended) and
-        can be cached; everything after it is the "unstable" suffix that must
-        be re-rendered on each update.
+        The split point is the last blank-line boundary that lies outside of
+        any open code fence (tracked via even/odd count of ``` markers).
+
+        This method is retained as a public utility and is used directly by
+        tests. It is not currently used in production rendering
+        (_render_markdown_to_lines always renders the full text), but is
+        available for future use if prefix caching is re-introduced.
 
         Returns:
             tuple: (prefix_len, suffix_text) where ``text[:prefix_len]`` is the
