@@ -97,7 +97,7 @@
         "litellm_provider": "fireworks_ai",
         "input_cost_per_token": 0.000008,
         "output_cost_per_token": 0.000008,
-        "mode": "chat",
+        "mode": "chat"
     },
     "fireworks_ai/accounts/fireworks/models/deepseek-v3-0324": {
         "max_tokens": 160000,
@@ -106,7 +106,7 @@
         "litellm_provider": "fireworks_ai",
         "input_cost_per_token": 0.0000009,
         "output_cost_per_token": 0.0000009,
-        "mode": "chat",
+        "mode": "chat"
     },
     "openrouter/openrouter/quasar-alpha": {
         "max_input_tokens": 1000000,
@@ -786,6 +786,6 @@
     },
   "together_ai/Qwen/Qwen3-235B-A22B-fp8-tput": {
         "input_cost_per_token": 0.0000002,
-        "output_cost_per_token": 0.0000006,
+        "output_cost_per_token": 0.0000006
   }
 }
