@@ -79,15 +79,12 @@ claude-sonnet-4-20250514
 claude-opus-4-20250514
 claude-opus-4-6
 claude-opus-4-7
+claude-opus-4-8
 claude-sonnet-4-5
 claude-sonnet-4-5-20250929
 claude-sonnet-4-6
-claude-sonnet-4-7
 claude-haiku-4-5
 claude-haiku-4-5-20251001
-anthropic/claude-sonnet-4-7
-anthropic/claude-opus-4-7
-anthropic/claude-haiku-4-5
 """
 
 ANTHROPIC_MODELS = [ln.strip() for ln in ANTHROPIC_MODELS.splitlines() if ln.strip()]
@@ -95,9 +92,9 @@ ANTHROPIC_MODELS = [ln.strip() for ln in ANTHROPIC_MODELS.splitlines() if ln.str
 # Mapping of model aliases to their canonical names
 MODEL_ALIASES = {
     # Claude models
-    "sonnet": "anthropic/claude-sonnet-4-7",
-    "haiku": "anthropic/claude-haiku-4-5",
-    "opus": "anthropic/claude-opus-4-7",
+    "sonnet": "claude-sonnet-4-6",
+    "haiku": "claude-haiku-4-5-20251001",
+    "opus": "claude-opus-4-8",
     # GPT models
     "4": "gpt-4-0613",
     "4o": "gpt-4o",

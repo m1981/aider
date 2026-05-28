@@ -1858,7 +1858,7 @@
 # Claude 4.5/4.6 (Anthropic docs: models/overview)
 - name: claude-sonnet-4-6
   edit_format: diff
-  weak_model_name: claude-haiku-4-5
+  weak_model_name: claude-haiku-4-5-20251001
   use_repo_map: true
   examples_as_sys_msg: false
   extra_params:
@@ -1868,9 +1868,22 @@
   editor_edit_format: editor-diff
   accepts_settings: ["thinking_tokens"]
 
+- name: claude-opus-4-8
+  edit_format: diff
+  weak_model_name: claude-haiku-4-5-20251001
+  use_repo_map: true
+  examples_as_sys_msg: false
+  extra_params:
+    max_tokens: 128000
+  cache_control: true
+  editor_model_name: claude-sonnet-4-6
+  editor_edit_format: editor-diff
+  use_temperature: false
+  overeager: true
+
 - name: claude-opus-4-7
   edit_format: diff
-  weak_model_name: claude-haiku-4-5
+  weak_model_name: claude-haiku-4-5-20251001
   use_repo_map: true
   examples_as_sys_msg: false
   extra_params:
@@ -1883,7 +1896,7 @@
 
 - name: claude-opus-4-6
   edit_format: diff
-  weak_model_name: claude-haiku-4-5
+  weak_model_name: claude-haiku-4-5-20251001
   use_repo_map: true
   examples_as_sys_msg: false
   extra_params:
@@ -1896,7 +1909,7 @@
 
 - name: claude-sonnet-4-5-20250929
   edit_format: diff
-  weak_model_name: claude-haiku-4-5
+  weak_model_name: claude-haiku-4-5-20251001
   use_repo_map: true
   examples_as_sys_msg: false
   extra_params:
@@ -1908,7 +1921,7 @@
 
 - name: claude-sonnet-4-5
   edit_format: diff
-  weak_model_name: claude-haiku-4-5
+  weak_model_name: claude-haiku-4-5-20251001
   use_repo_map: true
   examples_as_sys_msg: false
   extra_params:
@@ -1920,7 +1933,7 @@
 
 - name: claude-haiku-4-5-20251001
   edit_format: diff
-  weak_model_name: claude-haiku-4-5
+  weak_model_name: claude-haiku-4-5-20251001
   use_repo_map: true
   examples_as_sys_msg: false
   extra_params:
@@ -1929,7 +1942,7 @@
 
 - name: claude-haiku-4-5
   edit_format: diff
-  weak_model_name: claude-haiku-4-5
+  weak_model_name: claude-haiku-4-5-20251001
   use_repo_map: true
   examples_as_sys_msg: false
   extra_params:
