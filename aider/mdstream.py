@@ -142,50 +142,13 @@ class MarkdownStream:
     def _render_markdown_to_lines(self, text):
         """Render markdown text to a list of lines.
 
-        Renders incrementally: a "stable" prefix of the markdown (whole blocks
-        ending at a blank-line boundary outside any open code fence) is rendered
-        once and cached, and only the trailing "unstable" suffix is re-rendered
-        on each call. This avoids re-rendering the whole document every update.
-
         Args:
             text (str): Markdown text to render
 
         Returns:
             list: List of rendered lines with line endings preserved
         """
-        prefix, suffix = self.find_minimal_suffix(text)
-
-        # Re-render and cache the stable prefix only when it has grown.
-        if prefix != self._stable_prefix_len:
-            stable_text = text[:prefix]
-            if stable_text:
-                # Render the prefix both with and without a trailing sentinel
-                # paragraph.  Rich renders the last block differently when it
-                # has no successor (it omits the trailing blank line), so we
-                # append a sentinel to force non-terminal rendering, then keep
-                # only the lines that are identical in both renders — those are
-                # truly stable and will match the full-document render.
-                sentinel = "\u200b\n"  # zero-width space — renders as blank
-                lines_plain = self._render_text(stable_text).splitlines(keepends=True)
-                lines_with_sentinel = self._render_text(
-                    stable_text + "\n" + sentinel
-                ).splitlines(keepends=True)
-                # Find the longest common prefix of the two line lists.
-                stable_len = 0
-                for a, b in zip(lines_plain, lines_with_sentinel):
-                    if a == b:
-                        stable_len += 1
-                    else:
-                        break
-                self._stable_rendered_lines = lines_with_sentinel[:stable_len]
-            else:
-                self._stable_rendered_lines = []
-            self._stable_prefix_len = prefix
-
-        suffix_output = self._render_text(suffix) if suffix else ""
-        suffix_lines = suffix_output.splitlines(keepends=True)
-
-        return self._stable_rendered_lines + suffix_lines
+        return self._render_text(text).splitlines(keepends=True)
 
     def __del__(self):
         """Destructor to ensure Live display is properly cleaned up."""
