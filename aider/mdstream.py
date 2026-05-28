@@ -115,11 +115,6 @@ class MarkdownStream:
         else:
             self.mdargs = dict()
 
-        # Cache for the rendered "stable" markdown prefix to avoid re-rendering
-        # the entire document on every streaming update (which is O(n^2)).
-        self._stable_prefix_len = 0
-        self._stable_rendered_lines = []
-
         # Defer Live creation until the first update.
         self.live = None
         self._live_started = False
